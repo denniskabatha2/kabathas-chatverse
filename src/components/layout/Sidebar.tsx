@@ -1,4 +1,5 @@
 import { Home, Search, Heart, MessageCircle, PlusSquare, User } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar as SidebarContainer,
   SidebarContent,
@@ -19,6 +20,8 @@ const menuItems = [
 ];
 
 export const Sidebar = () => {
+  const location = useLocation();
+
   return (
     <SidebarContainer>
       <SidebarContent>
@@ -31,10 +34,15 @@ export const Sidebar = () => {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton asChild>
-                    <a href={item.path} className="flex items-center gap-2 p-2">
+                    <Link
+                      to={item.path}
+                      className={`flex items-center gap-2 p-2 ${
+                        location.pathname === item.path ? "bg-accent" : ""
+                      }`}
+                    >
                       <item.icon className="w-6 h-6" />
                       <span>{item.label}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
