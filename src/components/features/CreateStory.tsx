@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
 import { ImagePlus } from "lucide-react";
 
 export const CreateStory = () => {
@@ -20,31 +19,20 @@ export const CreateStory = () => {
     if (!file) return;
 
     try {
-      const user = supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from('stories')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { error: dbError } = await supabase
-        .from('stories')
-        .insert([
-          {
-            user_id: (await user).data.user?.id,
-            image_url: fileName,
-            created_at: new Date().toISOString(),
-          },
-        ]);
-
-      if (dbError) throw dbError;
+      // Mock story creation
+      const imageUrl = URL.createObjectURL(file);
+      const stories = JSON.parse(localStorage.getItem('stories') || '[]');
+      stories.push({
+        id: Date.now(),
+        user_id: '1',
+        image_url: imageUrl,
+        created_at: new Date().toISOString(),
+      });
+      localStorage.setItem('stories', JSON.stringify(stories));
 
       toast({ title: "Story created successfully!" });
       setFile(null);
+      window.location.reload(); // Refresh to show new story
     } catch (error: any) {
       toast({ 
         title: "Error creating story",

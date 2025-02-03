@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
 
 export const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,21 +13,10 @@ export const AuthForm = () => {
     e.preventDefault();
     
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        toast({ title: "Successfully logged in!" });
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (error) throw error;
-        toast({ title: "Check your email to confirm your account!" });
-      }
+      // Mock authentication
+      localStorage.setItem('user', JSON.stringify({ email, id: '1' }));
+      toast({ title: isLogin ? "Successfully logged in!" : "Account created successfully!" });
+      window.location.reload(); // Refresh to update auth state
     } catch (error: any) {
       toast({ 
         title: "Error",

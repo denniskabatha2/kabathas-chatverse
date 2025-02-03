@@ -1,10 +1,9 @@
+import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { CreateStory } from "@/components/features/CreateStory";
-import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { PlusCircle, ImagePlus } from "lucide-react";
 
@@ -12,12 +11,14 @@ const Profile = () => {
   const [showCreateStory, setShowCreateStory] = useState(false);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const { toast } = useToast();
-  const [session, setSession] = useState(null);
+  const [user, setUser] = useState<any>(null);
 
-  // Check auth status
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setSession(session);
-  });
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   // Handle file upload for posts
   const handlePostUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,29 +26,21 @@ const Profile = () => {
     if (!file) return;
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from('posts')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { error: dbError } = await supabase
-        .from('posts')
-        .insert([
-          {
-            user_id: session?.user.id,
-            image_url: fileName,
-            caption: '',
-            created_at: new Date().toISOString(),
-          },
-        ]);
-
-      if (dbError) throw dbError;
+      // Mock post creation
+      const imageUrl = URL.createObjectURL(file);
+      const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+      posts.push({
+        id: Date.now(),
+        user_id: user?.id,
+        image_url: imageUrl,
+        caption: '',
+        created_at: new Date().toISOString(),
+      });
+      localStorage.setItem('posts', JSON.stringify(posts));
 
       toast({ title: "Post created successfully!" });
       setShowCreatePost(false);
+      window.location.reload(); // Refresh to show new post
     } catch (error: any) {
       toast({ 
         title: "Error creating post",
@@ -57,7 +50,12 @@ const Profile = () => {
     }
   };
 
-  if (!session) {
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    window.location.reload();
+  };
+
+  if (!user) {
     return (
       <MainLayout>
         <div className="p-4">
@@ -73,10 +71,15 @@ const Profile = () => {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-start gap-8 mb-8">
             <Avatar className="w-32 h-32">
-              <AvatarImage src={session?.user?.user_metadata?.avatar_url || "/placeholder.svg"} alt="Profile" />
+              <AvatarImage src="https://i.pravatar.cc/150?img=1" alt="Profile" />
             </Avatar>
-            <div>
-              <h1 className="text-2xl font-bold mb-2">{session?.user?.email}</h1>
+            <div className="flex-1">
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">{user.email}</h1>
+                <Button variant="destructive" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
               <div className="flex gap-4 mb-4">
                 <Button 
                   variant="outline"
