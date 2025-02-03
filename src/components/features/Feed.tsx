@@ -1,4 +1,4 @@
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle, Send, Bookmark } from "lucide-react";
 import { useState } from "react";
 
@@ -39,7 +39,7 @@ const Post = ({ post }: { post: typeof posts[0] }) => {
     <div className="border-b border-border pb-4 mb-4">
       <div className="flex items-center gap-2 p-4">
         <Avatar>
-          <Avatar.Image src={post.user.avatar} alt={post.user.name} />
+          <AvatarImage src={post.user.avatar} alt={post.user.name} />
         </Avatar>
         <span className="font-semibold">{post.user.name}</span>
       </div>
