@@ -12,6 +12,18 @@ interface Post {
   created_at: string;
 }
 
+interface MockPost {
+  id: number;
+  user: {
+    name: string;
+    avatar: string;
+  };
+  image: string;
+  likes: number;
+  caption: string;
+  comments: number;
+}
+
 export const Feed = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -21,7 +33,7 @@ export const Feed = () => {
     setPosts(savedPosts);
   }, []);
 
-  const mockPosts = [
+  const mockPosts: MockPost[] = [
     {
       id: 1,
       user: { name: "John Doe", avatar: "https://i.pravatar.cc/150?img=1" },
@@ -52,7 +64,7 @@ export const Feed = () => {
   );
 };
 
-const Post = ({ post }: { post: typeof mockPosts[0] }) => {
+const Post = ({ post }: { post: MockPost }) => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
