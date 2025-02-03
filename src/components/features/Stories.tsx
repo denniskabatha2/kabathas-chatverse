@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { PlusCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface Story {
   id: number;
@@ -11,10 +16,10 @@ interface Story {
 
 export const Stories = () => {
   const [stories, setStories] = useState<Story[]>([]);
+  const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
-    // Load stories from localStorage
     const savedStories = JSON.parse(localStorage.getItem('stories') || '[]');
     setStories(savedStories);
   }, []);
@@ -47,16 +52,27 @@ export const Stories = () => {
         </div>
       ))}
       {stories.map((story) => (
-        <div key={story.id} className="flex flex-col items-center gap-1">
-          <div className="story-ring">
-            <div className="p-0.5 bg-background rounded-full">
-              <Avatar className="w-16 h-16">
-                <AvatarImage src={story.image_url} alt="Story" />
-              </Avatar>
+        <Dialog key={story.id}>
+          <DialogTrigger>
+            <div className="flex flex-col items-center gap-1">
+              <div className="story-ring">
+                <div className="p-0.5 bg-background rounded-full">
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage src={story.image_url} alt="Story" />
+                  </Avatar>
+                </div>
+              </div>
+              <span className="text-sm">Story</span>
             </div>
-          </div>
-          <span className="text-sm">Story</span>
-        </div>
+          </DialogTrigger>
+          <DialogContent className="max-w-screen-md w-full p-0">
+            <img
+              src={story.image_url}
+              alt="Story"
+              className="w-full h-auto max-h-[80vh] object-contain"
+            />
+          </DialogContent>
+        </Dialog>
       ))}
     </div>
   );
